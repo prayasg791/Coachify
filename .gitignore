@@ -5,6 +5,7 @@ frontend/dist/
 **/dist/
 backend/coverage/
 coverage/
+**/coverage/
 
 # Local environment and secrets
 .env
