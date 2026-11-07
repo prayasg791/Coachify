@@ -211,6 +211,11 @@ function ReminderList({ role }) {
           ? "Review reminder messages and delivery status for your linked children. The list includes all linked children with active consent."
           : "Review scheduled and sent reminder records across your assigned centres."}
       />
+      {import.meta.env.DEV && (
+        <p className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs leading-5 text-amber-900">
+          Demo messaging only: reminder delivery is simulated in development. No SMS or WhatsApp messages are sent.
+        </p>
+      )}
       {isParent && selectedStudent && students.length > 1 && (
         <p className="mb-4 rounded-lg border border-brand-100 bg-brand-50/60 px-3 py-2.5 text-xs leading-5 text-brand-800">
           Selected student: <strong>{selectedStudent.name} · {selectedStudent.studentId}</strong>. Reminder history below includes all linked children because the API returns the parent’s combined history.
