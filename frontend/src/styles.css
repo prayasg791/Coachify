@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "Inter", sans-serif;
+  color: #172033;
+  background: #f5f7fb;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  min-height: 100%;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+::selection {
+  color: #202e68;
+  background: #dce5ff;
+}
+
+@media print {
+  body * { visibility: hidden !important; }
+  .receipt-backdrop, .receipt-print-area, .receipt-print-area * { visibility: visible !important; }
+  .receipt-backdrop { position: absolute !important; inset: 0 !important; overflow: visible !important; padding: 0 !important; background: white !important; }
+  .receipt-print-area { width: 100% !important; max-width: none !important; margin: 0 !important; padding: 12mm !important; box-shadow: none !important; }
+  .receipt-actions { display: none !important; }
+  @page { margin: 0; size: A4; }
+}
