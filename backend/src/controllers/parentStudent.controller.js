@@ -1,14 +1,15 @@
 import Consent from "../models/Consent.js";
 import Student from "../models/Student.js";
 import { logError } from "../utils/logger.js";
+import { withProductionConsentGuard } from "../utils/consentQuery.js";
 
 const getParentStudents = async (req, res) => {
   try {
-    const consents = await Consent.find({
+    const consents = await Consent.find(withProductionConsentGuard({
       parent: req.user._id,
       purpose: "STUDENT_DATA_PROCESSING",
       status: "GRANTED",
-    }).select("student").lean();
+    })).select("student").lean();
 
     const studentIds = [...new Set(consents.map(({ student }) => student.toString()))];
     if (studentIds.length === 0) {

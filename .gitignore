@@ -12,8 +12,40 @@ coverage/
 .env.*
 **/.env
 **/.env.*
-!frontend/.env.example
-!backend/.env.example
+!.env.example
+!**/.env.example
+
+# Credential files and private key material
+**/.credentials
+**/.credentials.*
+**/credentials/
+**/credentials.*
+**/secrets/
+**/secrets.*
+**/.aws/
+**/.ssh/
+**/.netrc
+**/.npmrc
+**/.pypirc
+**/credentials.json
+**/secrets.json
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+
+# Temporary and editor swap files
+*.tmp
+*.temp
+*.swp
+*.swo
+*.bak
+*.old
+*.orig
+*~
+~$*
 
 # Runtime and editor files
 *.log

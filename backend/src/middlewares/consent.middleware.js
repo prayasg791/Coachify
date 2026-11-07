@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import Student from "../models/Student.js";
 import Consent from "../models/Consent.js";
 import { logError } from "../utils/logger.js";
+import { withProductionConsentGuard } from "../utils/consentQuery.js";
 
 const requireStudentConsent = async (req, res, next) => {
   try {
@@ -42,12 +43,12 @@ const requireStudentConsent = async (req, res, next) => {
       });
     }
 
-    const consent = await Consent.findOne({
+    const consent = await Consent.findOne(withProductionConsentGuard({
       parent: req.user._id,
       student: studentId,
       purpose: "STUDENT_DATA_PROCESSING",
       status: "GRANTED",
-    });
+    }));
 
     if (!consent) {
       return res.status(403).json({

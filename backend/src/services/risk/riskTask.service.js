@@ -280,7 +280,7 @@ const assignRiskTask = async ({ riskFlagId, counsellorId, assignedBy }) => {
           status: "OPEN",
         },
         { $set: { assignedTo: parsedCounsellorId } },
-        { new: true, session },
+        { returnDocument: "after", session },
       );
       if (!updatedFlag) throw createError("Open follow-up task not found", 409);
 

@@ -33,7 +33,7 @@ The frontend uses the same-origin `/api` base in production by default, or `VITE
 | User | Authentication identity, role, password hash, active status, and centre assignments for staff; parent identity links from Student. |
 | Centre / Batch | Institute centres and batches; a batch belongs to a centre. |
 | Student | Human-readable student ID, name, parent, centre, batch, course dates, status. |
-| Consent | Parent/student/purpose consent, state, policy version, verification metadata, and audit history. |
+| Consent | Parent/student/purpose consent, state, policy version, verification metadata, and audit history. Synthetic demo records are marked `DEMO_SEED` / `isDemoConsent`; they are explicitly non-legal and production consent queries exclude them. |
 | FeePlan / Instalment | Student fee plan and due instalments in integer paise. |
 | Payment | Student/instalment payment, method, transaction reference, amount, status, dates, and recording actor. Only SUCCESS contributes to a ledger. |
 | UnmatchedPayment | Accounts review record for an unallocated payment; only a successful match creates a separate ledger payment. |

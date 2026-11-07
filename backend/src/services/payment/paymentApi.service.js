@@ -212,7 +212,7 @@ const recordOfflinePaymentInTransaction = async ({
   const lockedInstalment = await Instalment.findOneAndUpdate(
     { _id: instalmentId },
     { $inc: { __v: 1 } },
-    { new: true, session }
+    { returnDocument: "after", session }
   );
 
   if (!lockedInstalment || lockedInstalment.student.toString() !== student._id.toString()) {

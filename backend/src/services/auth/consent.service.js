@@ -45,6 +45,7 @@ const grantParentalConsent = async ({
       $set: {
         status: "GRANTED",
         verificationMethod: "OTP",
+        isDemoConsent: false,
         verificationReference: `PARENT_OTP_${verifiedAt}`,
         policyVersion,
         consentedAt: new Date(),

@@ -29,8 +29,14 @@ const consentSchema = new mongoose.Schema(
 
     verificationMethod: {
       type: String,
-      enum: ["OTP"],
+      enum: ["OTP", "DEMO_SEED"],
       required: true,
+    },
+
+    // Synthetic seed consent is only eligible in development and is not legal consent.
+    isDemoConsent: {
+      type: Boolean,
+      default: false,
     },
 
     verificationReference: {

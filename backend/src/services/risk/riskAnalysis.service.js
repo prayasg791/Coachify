@@ -132,7 +132,7 @@ const analyzeStudentRisk = async (studentId) => {
       },
     },
     {
-      new: true,
+      returnDocument: "after",
       upsert: true,
       setDefaultsOnInsert: true,
     }

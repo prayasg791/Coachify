@@ -29,9 +29,11 @@ Set `VITE_API_BASE_URL` only when the frontend should call a specific API origin
 
 ## Demo database and synthetic seed
 
-Use a separately provisioned MongoDB Atlas database named with a `demo`, `dev`, or `test` marker (for example `coachify_demo`). Configure its URI only in local/private environment settings. Verify the selected Atlas database and network access before seeding. Never point the demo seeder at production data: it is guarded by `NODE_ENV=development`, `DEMO_SEED_ENABLED=true`, and the database-name check.
+Use a separately provisioned MongoDB Atlas database named with a `demo`, `dev`, or `test` marker (for example `coachify_demo`). Configure its URI only in local/private environment settings. Verify the selected Atlas database and network access before seeding. Never point the demo seeder at production data: it is guarded by `NODE_ENV=development`, `DEMO_SEED_ENABLED=true`, `DEMO_OTP_ENABLED=true`, and the database-name check.
 
-Set private `DEMO_ACCOUNTS_PASSWORD`, `DEMO_COUNSELLOR_PASSWORD`, and `DEMO_PARENT_PASSWORD` values before running the seed. The seed uses synthetic accounts and repeatable upserts. Seeded Accounts and Counsellor emails use the `@coachify.test` domain. Parent demo phones are synthetic; the allowlist is configured through `DEMO_PARENT_PHONES`.
+Set private `DEMO_ACCOUNTS_PASSWORD`, `DEMO_COUNSELLOR_PASSWORD`, and `DEMO_PARENT_PASSWORD` values before running the seed. The seed uses synthetic accounts and repeatable upserts. Seeded Accounts and Counsellor emails use the `@coachify.test` domain. There are four Accounts Executive identifiers: `accounts.demo@coachify.test`, `accounts.jpr-nth.demo@coachify.test`, `accounts.jpr-sth.demo@coachify.test`, and `accounts.jpr-wst.demo@coachify.test`; each sees only its centre. The Counsellor identifier is `counsellor.demo@coachify.test`. The original three parent identifiers remain, and the other parent emails follow `parent.demo.NNNN@example.test` (sequence 0004–0120). Parent OTP login uses the corresponding synthetic account from `DEMO_PARENT_PHONES` in the example configuration; values are not repeated here.
+
+Seeded parent consent is marked `DEMO_SEED` and is synthetic only, not legally valid consent. It is accepted for portal testing in development. Production consent lookups explicitly exclude demo consent; real parents must grant consent through the OTP-authenticated consent flow.
 
 For demo-only parent login set `DEMO_OTP_ENABLED=true` in development. OTP is returned to the demo login flow for eligible synthetic accounts and is not logged. Do not enable this mechanism in production. Accounts/Counsellor passwords are the private values supplied to the seed. No shared password is published here.
 

@@ -4,6 +4,7 @@ import Receipt from "../../models/Receipt.js";
 import ReceiptCounter from "../../models/ReceiptCounter.js";
 import Student from "../../models/Student.js";
 import Consent from "../../models/Consent.js";
+import { withProductionConsentGuard } from "../../utils/consentQuery.js";
 import AuditLog from "../../models/AuditLog.js";
 
 const error = (message, statusCode) => Object.assign(new Error(message), { statusCode });
@@ -97,7 +98,7 @@ const assertAccess = async ({ receipt, user }) => {
   if (user.role !== "PARENT") throw error("You are not authorized to access this receipt", 403);
   const student = await Student.findOne({ _id: receipt.student.id, parent: user._id }).select("_id");
   if (!student) throw error("Receipt not found", 404);
-  const consent = await Consent.findOne({ parent: user._id, student: receipt.student.id, purpose: "STUDENT_DATA_PROCESSING", status: "GRANTED" }).select("_id");
+  const consent = await Consent.findOne(withProductionConsentGuard({ parent: user._id, student: receipt.student.id, purpose: "STUDENT_DATA_PROCESSING", status: "GRANTED" })).select("_id");
   if (!consent) throw error("Parental consent is required to access this receipt", 403);
 };
 
@@ -109,7 +110,7 @@ export const getPaymentReceipt = async ({ paymentId, user }) => {
   if (user.role === "PARENT") {
     const student = await Student.findOne({ _id: payment.student._id, parent: user._id }).select("_id");
     if (!student) throw error("Receipt not found", 404);
-    const consent = await Consent.findOne({ parent: user._id, student: payment.student._id, purpose: "STUDENT_DATA_PROCESSING", status: "GRANTED" }).select("_id");
+    const consent = await Consent.findOne(withProductionConsentGuard({ parent: user._id, student: payment.student._id, purpose: "STUDENT_DATA_PROCESSING", status: "GRANTED" })).select("_id");
     if (!consent) throw error("Parental consent is required to access this receipt", 403);
   } else if (user.role === "ACCOUNTS") {
     const centres = (user.centres ?? []).map((value) => String(value?._id ?? value));
@@ -129,7 +130,7 @@ export const listStudentReceipts = async ({ studentId, user, page = 1, limit = 2
   if (user.role === "PARENT") {
     const student = await Student.findOne({ _id: studentId, parent: user._id }).select("_id");
     if (!student) throw error("Student not found", 404);
-    const consent = await Consent.findOne({ parent: user._id, student: studentId, purpose: "STUDENT_DATA_PROCESSING", status: "GRANTED" }).select("_id");
+  const consent = await Consent.findOne(withProductionConsentGuard({ parent: user._id, student: studentId, purpose: "STUDENT_DATA_PROCESSING", status: "GRANTED" })).select("_id");
     if (!consent) throw error("Parental consent is required to access student data", 403);
   } else if (user.role === "ACCOUNTS") {
     const student = await Student.findById(studentId).select("centre");
