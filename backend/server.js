@@ -81,6 +81,16 @@ app.use(cors({
   maxAge: 600,
 }));
 app.use(express.json({ limit: "1mb" }));
+app.use(async (req, res, next) => {
+  if (req.path === "/" || req.path === "/health") return next();
+  try {
+    validateRuntimeConfig();
+    await connectDB();
+    return next();
+  } catch {
+    return res.status(503).json({ success: false, message: "Service unavailable" });
+  }
+});
 app.use("/api/auth", authRoutes);
 app.use("/api/fees", feeRoutes);
 app.use("/api/payments", paymentRoutes);
@@ -95,9 +105,15 @@ app.use("/api/reminders", reminderRoutes);
 app.use("/api/receipts", receiptRoutes);
 app.use("/api/reports/accounts", reportsRoutes);
 
-app.get("/health", (_req, res) => {
-  const ready = mongoose.connection.readyState === 1;
-  return res.status(ready ? 200 : 503).json({ status: ready ? "ok" : "not_ready" });
+app.get("/health", async (_req, res) => {
+  try {
+    validateRuntimeConfig();
+    await connectDB();
+    const ready = mongoose.connection.readyState === 1;
+    return res.status(ready ? 200 : 503).json({ status: ready ? "ok" : "not_ready" });
+  } catch {
+    return res.status(503).json({ status: "not_ready" });
+  }
 });
 app.get("/", (_req, res) => res.status(200).json({ success: true, message: "Coachify API is running" }));
 

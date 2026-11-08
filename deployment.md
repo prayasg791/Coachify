@@ -62,23 +62,18 @@ Configure these through the hosting provider's secret/environment settings. This
 
 Production startup requires a strong JWT secret, valid MongoDB URI and port, exact HTTPS `CORS_ORIGINS`, and valid paired institute/tax configuration when GST is taxable. Do not enable demo seed/OTP in production. A real OTP, payment, refund, and messaging provider is required before enabling those production workflows; mock services are intentionally unavailable there.
 
-## Vercel frontend
+## Vercel single-project deployment
 
-1. Import the repository into Vercel after it is pushed to a private/authorized GitHub repository.
-2. Set the project root to `frontend`.
-3. Build command: `npm run build`. Output directory: `dist`.
-4. Configure `VITE_API_BASE_URL` with the backend `/api` URL if using separate origins, or configure a Vercel rewrite to the backend and leave it unset for same-origin `/api`.
-5. Configure a React Router SPA fallback to `index.html` if direct nested-route navigation is not handled automatically.
-6. Add the exact frontend HTTPS origin to backend `CORS_ORIGINS` when calling a separate backend origin.
+The repository root `vercel.json` defines two Vercel Services: `frontend` (Vite) and `backend` (Express). The `/health` and `/api/(.*)` rewrites route to Express, preserving every existing API route; `/health` remains an explicit readiness endpoint. The final catch-all sends page requests to the Vite service, including client-side routes.
 
-## Node.js backend host and MongoDB Atlas
+1. Import the repository root as one Vercel project. In Project Settings → Build and Deployment, select **Services** as the framework/preset; keep the project root at the repository root so Vercel reads `vercel.json`.
+2. Vercel detects each service's build independently. Vite runs `npm run build` and serves `dist`. Express is deployed as a function from `backend/server.js`; it has no separate build command or static output directory. Leave service build/output overrides unset unless Vercel changes its framework defaults.
+3. In the frontend service's build environment settings, set `VITE_API_BASE_URL` to `/api` for Preview and Production. This is a same-origin service path, so it works with each deployment's shared domain and does not embed a deployment hostname in the frontend bundle.
+4. In the backend service's runtime environment settings, set `NODE_ENV=production`, `MONGO_URI`, a strong `JWT_SECRET`, and `CORS_ORIGINS` to the exact HTTPS origin used by the frontend (for example, the production custom domain origin, without a path or trailing slash). Store values in Vercel's encrypted environment settings, never in Git or `vercel.json`. Add any additional trusted frontend origins as comma-separated exact HTTPS origins. Vercel Preview URLs that need cross-origin access must be explicitly added to Preview `CORS_ORIGINS`; same-origin `/api` calls do not require browser CORS permission.
+5. Configure remaining required production values (such as institute receipt settings) in Vercel's backend runtime environment settings. Do not set `MOCK_GATEWAY_SECRET`, `DEMO_SEED_ENABLED=true`, or `DEMO_OTP_ENABLED=true` in Production. The existing production guards continue to reject mock payment/refund processing and demo OTP.
+6. Provision MongoDB Atlas for production, set network access and database-user permissions for the backend runtime, and verify the Vercel backend `/health` endpoint after deployment. Keep demo seeding restricted to a separate development database.
 
-1. Create a Node.js service using `backend` as the root and `npm ci` as the install command.
-2. Start command: `node server.js` (or the host's Node start command). Health check path: `/health`.
-3. Set runtime variables via host secrets, including an Atlas URI for the intended production database, strong JWT secret, `NODE_ENV=production`, `PORT` as supplied by the host, and exact frontend origins in `CORS_ORIGINS`.
-4. Configure Atlas network access for the backend host's outbound network and database user privileges. Keep credentials only in the host's secret manager.
-5. Deploy and verify `/health` returns HTTP 200 only after the application connects to MongoDB. Confirm logs contain no credentials or personal data.
-6. Do not run the synthetic demo seeder against production. Use a separately provisioned demo database and private development environment.
+The backend opens/reuses its MongoDB connection on API requests so the exported Express app works in Vercel's function runtime; standalone `node server.js` startup remains supported for local development. The public `/health` readiness URL is routed to the backend; the backend root route remains available inside that service.
 
 ## Demo behavior and limitations
 
